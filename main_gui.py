@@ -2,23 +2,31 @@ from cgitb import reset
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import numpy as np
 import time
+
+
+# number_of_cols = int(input("Enter the number of cols"))
 
 root = tk.Tk()
 root.title('Basic Layout of Water Body')
 root.configure(background='#232343')
 root.geometry("700x600")
 
-fig = Figure()
+fig = figure()
 ax = fig.add_subplot(111)
+
+x = [525, 525, 175, 175]
+y = [175, 525, 175, 525]
 
 ax.set_title("Water area")
 ax.set_xlabel("X coords")
 ax.set_ylabel("Y coords")
 ax.set_xlim(0, 700)
 ax.set_ylim(0, 700)
+ax.plot(x, y, 'ro')
 lines = ax.plot([], [])[0]
 
 canvas = FigureCanvasTkAgg(fig, master=root)
@@ -44,7 +52,6 @@ reset.place(x=stop.winfo_x()+start.winfo_reqwidth()+20, y=500)
 # start
 
 
-# adding points to the plot
 def plot_start():
     print("Plot started")
 

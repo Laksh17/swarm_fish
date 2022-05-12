@@ -11,8 +11,8 @@ let canvasPosition = canvas.getBoundingClientRect();
 
 class Fish {
     constructor() {
-        this.x = canvas.width; //Math.floor(Math.random() * 100)
-        this.y = canvas.height / 2;
+        this.x = Math.floor(Math.random() * 550) + 50;
+        this.y = Math.floor(Math.random() * 550) + 50;
         this.radius = 50;
         // this.angle = 0;
         this.frameX = 0;

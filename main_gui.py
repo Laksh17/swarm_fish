@@ -7,6 +7,24 @@ from matplotlib.pyplot import figure
 import numpy as np
 import time
 
+# fish object
+
+
+class Fish:
+    def __init__(self, start, check_point):
+        self.prev_position = []
+        self.current_posiiton = start
+        self.x = start[0]
+        self.y = start[1]
+        self.h = 0
+        self.k = 0
+        self.r = 20
+        self.target = check_point
+        self.equation = (self.x - self.h) ^ 2 + (self.y - self.k) ^ 2 = self.r ^ 2
+
+    def move(self, distance):
+        self.prev_position = self.current_position
+
 
 # number_of_cols = int(input("Enter the number of cols"))
 
@@ -17,9 +35,6 @@ root.geometry("700x600")
 
 fig = figure()
 ax = fig.add_subplot(111)
-
-x = [525, 525, 175, 175]
-y = [175, 525, 175, 525]
 
 ax.set_title("Water area")
 ax.set_xlabel("X coords")
@@ -48,8 +63,6 @@ root.update()
 reset = tk.Button(root, text='Reset', font=(
     'calbiri', 13), command=lambda: plot_reset())
 reset.place(x=stop.winfo_x()+start.winfo_reqwidth()+20, y=500)
-
-# start
 
 
 def plot_start():

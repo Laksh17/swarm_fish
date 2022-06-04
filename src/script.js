@@ -1,15 +1,15 @@
 //Basic Canvas Setup
-class Vector {
-    constructor(...components) {
-        this.components = components;
-    }
-    length() {
-        return Math.hypot(...this.components)
-    }
-    scaleBy(number) {
-        return new Vector(...this.components.map(components => components * number));
-    }
-}
+// class Vector {
+//     constructor(...components) {
+//         this.components = components;
+//     }
+//     length() {
+//         return Math.hypot(...this.components)
+//     }
+//     scaleBy(number) {
+//         return new Vector(...this.components.map(components => components * number));
+//     }
+// }
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -24,11 +24,12 @@ console.log(canvasPosition.left);
 class Fish {
     constructor() {
         // this.x = 50 + 550;
-        this.x = 50 + Math.floor(Math.random() * (canvasPosition.width - 100));
-        this.y = Math.floor(Math.random() * 550) + 50;
         this.radius = 15;
-        this.targetX = 50 + Math.floor(Math.random() * (canvasPosition.width - (2 * this.radius)));
-        this.targetY = 50 + Math.floor(Math.random() * (canvasPosition.height - (2 * this.radius)));
+        let rad = this.radius;
+        this.x = rad + Math.floor(Math.random() * (canvasPosition.width - 2 * rad));
+        this.y = rad + Math.floor(Math.random() * (canvasPosition.height - 2 * rad));
+        this.targetX = rad + Math.floor(Math.random() * (canvasPosition.width - 2 * rad));
+        this.targetY = rad + Math.floor(Math.random() * (canvasPosition.height - 2 * rad));
         this.frameX = 0;
         this.frameY = 0; //frames of sprite sheet
         this.frame = 0;
@@ -37,6 +38,7 @@ class Fish {
     }
     update() {
         // console.log("Function updated");
+        let rad = this.radius;
         const dx = this.x - this.targetX;
         const dy = this.y - this.targetY;
         const apporxX = 5;
@@ -49,9 +51,9 @@ class Fish {
             this.y -= dy / 60;
         }
         if (dx < apporxX && dy < apporxY) {
-            this.targetX = 50 + Math.floor(Math.random() * (canvasPosition.width - (2 * this.radius)));
+            this.targetX = rad + Math.floor(Math.random() * (canvasPosition.width - 2 * rad));
             // this.targetX = 400;
-            this.targetY = 50 + Math.floor(Math.random() * (canvasPosition.height - (2 * this.radius)));
+            this.targetY = rad + Math.floor(Math.random() * (canvasPosition.height - 2 * rad));
             // this.targetY = 400;
             // console.log("ran");
             console.log("This is target" + this.targetX);

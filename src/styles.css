@@ -18,3 +18,18 @@ body {
     border: 3px solid #213213;
     border-radius: 12px;
 }
+
+#generateFish {
+    width: 50px;
+    margin-left: 10px;
+    margin-right: 0;
+    height: 40px;
+    font-size: 20px;
+    color: #2024f3;
+    border-radius: 25%;
+    background-color: #8e8ef1;
+}
+
+#generateFish:hover {
+    cursor: pointer;
+}

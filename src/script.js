@@ -24,6 +24,7 @@ let gameframe = 0;
 let canvasPosition = canvas.getBoundingClientRect();
 let fishyArray = [];
 const generateButton = document.getElementById("generateFish");
+const clearButton = document.getElementById("clearFish");
 console.log(canvasPosition.left);
 
 function* range(start, end) {
@@ -171,6 +172,11 @@ generateButton.onclick = () => {
     fishyArray.push(new Fish(count + 1));
     console.log("ran");
     count++;
+}
+
+clearButton.onclick = () => {
+    fishyArray.pop();
+    count--;
 }
 // setTimeout(animate(), 10000);
 

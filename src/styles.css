@@ -19,17 +19,24 @@ body {
     border-radius: 12px;
 }
 
-#generateFish {
-    width: 50px;
+#button-div {
+    display: grid;
+}
+
+#generateFish,
+#clearFish {
+    width: 80px;
     margin-left: 10px;
     margin-right: 0;
+    margin-bottom: 10px;
     height: 40px;
     font-size: 20px;
     color: #2024f3;
-    border-radius: 25%;
+    border-radius: 45%;
     background-color: #8e8ef1;
 }
 
-#generateFish:hover {
+#generateFish:hover,
+#clearFish:hover {
     cursor: pointer;
 }

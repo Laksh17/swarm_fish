@@ -144,12 +144,6 @@ class Fish {
         // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
 }
-// const fish1 = new Fish();
-// const fish2 = new Fish();
-// const fish3 = new Fish();
-// const fish4 = new Fish();
-
-
 console.log(Fish.counter);
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -161,13 +155,6 @@ function animate() {
 }
 animate();
 
-// function handleFish() {
-//     for (let i = 0; i < fishyArray.length; i++) {
-//         fishyArray[i].update();
-//         fishyArray[i].draw();
-//         // console.log(fishyArray[i].section);
-//     }
-// }
 generateButton.onclick = () => {
     fishyArray.push(new Fish(count + 1));
     console.log("ran");
@@ -178,11 +165,3 @@ clearButton.onclick = () => {
     fishyArray.pop();
     count--;
 }
-// setTimeout(animate(), 10000);
-
-//Make 4 of them at random points
-//Design the algo such that they cover every inch of area
-//Mention the coords of other fish's locations to a given fish
-
-
-// console.log(Math.cos(3.14));

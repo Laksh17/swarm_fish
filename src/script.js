@@ -23,8 +23,11 @@ let count = 0;
 let gameframe = 0;
 let canvasPosition = canvas.getBoundingClientRect();
 let fishyArray = [];
-const generateButton = document.getElementById("generateFish");
-const clearButton = document.getElementById("clearFish");
+let intruderArray = [];
+const generateFishButton = document.getElementById("generateFish");
+const clearFishButton = document.getElementById("clearFish");
+const generateIntruderButton = document.getElementById("generateIntruder");
+const clearIntruderButton = document.getElementById("clearIntruder");
 console.log(canvasPosition.left);
 
 function* range(start, end) {
@@ -32,6 +35,13 @@ function* range(start, end) {
         yield i;
     }
 }
+
+function arrayRemove(arr, value) {
+    return arr.filter(function (ele) {
+        return ele != value;
+    });
+}
+
 //Add the fish object
 
 class Fish {
@@ -62,21 +72,11 @@ class Fish {
         // this.spriteHeight = 327;
         // this.spriteWidth = 498;
     }
-    // deploy(totalFish) {
-    //     this.isPaused = true;
-    //     this.targetY_start = (this.section - 1) * (canvasPosition.height / totalFish) + (this.gap + this.radius);
-    //     this.targetY_end = this.section * (canvasPosition.height / totalFish);
-    //     while ((this.y - this.targetY_start > this.approxY) || (this.y - this.targetY_start < this.approxY)) {
-    //         this.y -= (this.y - this.targetY_start) / 60;
-    //         this.x -= (this.x - this.targetX_start) / 60;
-    //     }
-    // }
+
     update() {
         console.log("Function updated");
         let slot_end = this.section;
         let slot_start = this.section - 1;
-        // const dx = this.x - this.targetX_end;
-        // const dy = this.y - this.targetY_end;
         const apporxX = 3;
         const apporxY = 3;
         this.targetY_start = slot_start * (canvasPosition.height / count) + this.radius;
@@ -95,11 +95,6 @@ class Fish {
             }
             if ((Math.abs(dx) <= apporxX) && (Math.abs(dy) <= apporxY)) {
                 this.reached = true;
-                // this.targetX_end = rad + Math.floor(Math.random() * (canvasPosition.width - 2 * rad));
-                // // this.targetX = 400;
-                // this.targetY_end = (slot_start * canvasPosition.height / count) + Math.floor(Math.random() * ((canvasPosition.height / count) - (2 * rad))) + rad;
-                // // this.targetY = 400;
-                // // console.log("ran");
                 console.log("Third IF ran");
                 console.log("This is target" + this.targetY_end);
                 console.log("slot start " + slot_start + " and slot end: " + slot_end + " and count is " + count);
@@ -143,25 +138,73 @@ class Fish {
         ctx.closePath();
         // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
+    checkIntruder() {
+        intruderArray.forEach(intruder => {
+            let dx = intruder.x - this.x;
+            let dy = intruder.y - this.y;
+            let distance = Math.sqrt((dx * dx) + (dy * dy));
+            if (
+                distance <= (intruder.radius + this.radius)
+            ) {
+                console.log("intruder started");
+                alert("Intruder Detected at location, (" + this.x + ", " + this.y + ")");
+                intruderArray = arrayRemove(intruderArray, intruder);
+                console.log(intruderArray);
+            }
+        })
+    }
 }
+
+class Intruder {
+    constructor(locationX, locationY) {
+        this.x = locationX;
+        this.y = locationY;
+        this.radius = 15;
+    }
+    draw() {
+        // console.log("Function drew");
+        ctx.fillStyle = '#7d20ed';
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "#FF0000";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+        // ctx.fillRect(this.x, this.y, this.radius, 10);
+    }
+}
+
 console.log(Fish.counter);
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let c of fishyArray) {
         c.update();
         c.draw();
+        c.checkIntruder();
+    }
+    for (let i of intruderArray) {
+        i.draw();
     }
     requestAnimationFrame(animate);
 }
 animate();
 
-generateButton.onclick = () => {
+generateFishButton.onclick = () => {
     fishyArray.push(new Fish(count + 1));
     console.log("ran");
     count++;
 }
 
-clearButton.onclick = () => {
+clearFishButton.onclick = () => {
     fishyArray.pop();
     count--;
+}
+
+generateIntruderButton.onclick = () => {
+    intruderArray.push(new Intruder((Math.random() * (canvasPosition.width - (2 * 15))) + 15, (Math.random() * (canvasPosition.height - (2 * 15))) + 15))
+    console.log("Intruder created");
+}
+
+clearIntruderButton.onclick = () => {
+    intruderArray.pop();
 }

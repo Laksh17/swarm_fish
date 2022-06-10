@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -17,6 +19,7 @@ body {
     height: 650px;
     border: 3px solid #213213;
     border-radius: 12px;
+    background: linear-gradient(#0eefbb 0%, #1aa4ea 25%, #1ed9ad 50%, #1aa4ea 75%, #1ed9ad 100%);
 }
 
 #button-div {
@@ -24,19 +27,48 @@ body {
 }
 
 #generateFish,
-#clearFish {
-    width: 80px;
+#clearFish,
+#generateIntruder,
+#clearIntruder {
+    width: 90px;
     margin-left: 10px;
     margin-right: 0;
     margin-bottom: 10px;
     height: 40px;
     font-size: 20px;
-    color: #2024f3;
-    border-radius: 45%;
-    background-color: #8e8ef1;
+    border-radius: 15%;
+    padding: 3px;
+}
+
+.title {
+    font-size: 22px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+#generateFish,
+#clearFish {
+    color: #f37120;
+    background-color: #000000;
+}
+
+#generateIntruder,
+#clearIntruder {
+    color: #000000;
+    background-color: #f37120;
 }
 
 #generateFish:hover,
 #clearFish:hover {
     cursor: pointer;
+    background-color: #410809;
+}
+
+#generateIntruder:hover,
+#clearIntruder:hover {
+    cursor: pointer;
+    background-color: #ffc800;
 }

@@ -24,10 +24,13 @@ let gameframe = 0;
 let canvasPosition = canvas.getBoundingClientRect();
 let fishyArray = [];
 let intruderArray = [];
+let shrimpArray = [];
 const generateFishButton = document.getElementById("generateFish");
 const clearFishButton = document.getElementById("clearFish");
 const generateIntruderButton = document.getElementById("generateIntruder");
 const clearIntruderButton = document.getElementById("clearIntruder");
+const generateShrimpButton = document.getElementById("generateShrimp");
+const clearShrimpButton = document.getElementById("clearShrimp");
 console.log(canvasPosition.left);
 
 function* range(start, end) {
@@ -118,8 +121,15 @@ class Fish {
                 this.targetX_start = this.targetX_end - this.targetX_start;
                 this.targetX_end = this.targetX_end - this.targetX_start;
                 if (this.y + (2 * (this.radius + this.gap)) > this.targetY_end) {
-                    this.reached = false;
-                    console.log("Change of Y ran");
+                    if (this.lastPath == false) {
+                        this.lastPath = true;
+                        this.y = this.targetY_end;
+                    }
+                    else {
+                        this.lastPath = false;
+                        this.reached = false;
+                        console.log("Change of Y ran");
+                    }
                 }
                 else {
                     this.y = this.y + (this.radius + this.gap);
@@ -131,7 +141,7 @@ class Fish {
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = '#073a0b';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -161,9 +171,31 @@ class Intruder {
         this.y = locationY;
         this.radius = 15;
     }
+    update() {
+
+    }
     draw() {
         // console.log("Function drew");
         ctx.fillStyle = '#7d20ed';
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "#FF0000";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+        // ctx.fillRect(this.x, this.y, this.radius, 10);
+    }
+}
+
+class Shrimp {
+    constructor(locationX, locationY) {
+        this.x = locationX;
+        this.y = locationY;
+        this.radius = 10;
+    }
+    draw() {
+        // console.log("Function drew");
+        ctx.fillStyle = '#7d9900';
         ctx.lineWidth = 10;
         ctx.strokeStyle = "#FF0000";
         ctx.beginPath();
@@ -184,6 +216,9 @@ function animate() {
     }
     for (let i of intruderArray) {
         i.draw();
+    }
+    for (let j of shrimpArray) {
+        j.draw();
     }
     requestAnimationFrame(animate);
 }
@@ -207,4 +242,13 @@ generateIntruderButton.onclick = () => {
 
 clearIntruderButton.onclick = () => {
     intruderArray.pop();
+}
+
+generateShrimpButton.onclick = () => {
+    shrimpArray.push(new Shrimp((Math.random() * (canvasPosition.width - (2 * 15))) + 15, (Math.random() * (canvasPosition.height - (2 * 15))) + 15))
+    console.log("Shrimp created");
+}
+
+clearShrimpButton.onclick = () => {
+    shrimpArray.pop();
 }

@@ -17,7 +17,7 @@ body {
 #canvas {
     width: 650px;
     height: 650px;
-    border: 3px solid #213213;
+    border: 3px solid #32131b;
     border-radius: 12px;
     background: linear-gradient(#0eefbb 0%, #1aa4ea 25%, #1ed9ad 50%, #1aa4ea 75%, #1ed9ad 100%);
 }
@@ -29,7 +29,9 @@ body {
 #generateFish,
 #clearFish,
 #generateIntruder,
-#clearIntruder {
+#clearIntruder,
+#generateShrimp,
+#clearShrimp {
     width: 90px;
     margin-left: 10px;
     margin-right: 0;
@@ -61,6 +63,12 @@ body {
     background-color: #f37120;
 }
 
+#generateShrimp,
+#clearShrimp {
+    color: #251111;
+    background-color: #980ef3;
+}
+
 #generateFish:hover,
 #clearFish:hover {
     cursor: pointer;
@@ -71,4 +79,10 @@ body {
 #clearIntruder:hover {
     cursor: pointer;
     background-color: #ffc800;
+}
+
+#generateShrimp:hover,
+#clearShrimp:hover {
+    cursor: pointer;
+    background-color: #217eb3;
 }

@@ -46,7 +46,16 @@ function arrayRemove(arr, value) {
 }
 
 //Add the fish object
-
+const fishLeft = new Image();
+fishLeft.src = 'fish_left.png';
+const fishRight = new Image();
+fishRight.src = 'fish_right.png';
+const intruderLeft = new Image();
+intruderLeft.src = 'intruder_fish_left.png';
+const intruderRight = new Image();
+intruderRight.src = 'intruder_fish_right.png';
+const shrimpImage = new Image();
+shrimpImage.src = 'Prawn_Sprite.png';
 class Fish {
     static count() {
         Fish.counter = (Fish.counter || 0) + 1;
@@ -56,13 +65,14 @@ class Fish {
         // this.x = 50 + 550;
         Fish.count();
         this.isPaused = false;
-        this.radius = 15;
+        this.radius = 38;
         this.x = this.radius;
         this.y = canvasPosition.height / 2;
         this.section = number;
         this.frameX = 0;
         this.frameY = 0; //frames of sprite sheet
         this.frame = 0;
+        this.angle = 0;
         this.gap = 10;
         this.targetX_start = this.radius;
         this.targetX_end = canvasPosition.width - this.radius;
@@ -72,8 +82,8 @@ class Fish {
         this.approxY = 1.5;
         this.lastPath = false;
         this.reached = false;
-        // this.spriteHeight = 327;
-        // this.spriteWidth = 498;
+        this.spriteHeight = 327;
+        this.spriteWidth = 498;
     }
 
     update() {
@@ -88,6 +98,8 @@ class Fish {
         if (this.reached == false) {
             const dx = this.x - this.targetX_start;
             const dy = this.y - this.targetY_start;
+            let theta = Math.atan2(dy, dx);
+            this.angle = theta;
             if (dx > apporxX || dx < -apporxX) {
                 this.x -= dx / 60;
                 console.log("dx = " + dx);
@@ -105,14 +117,19 @@ class Fish {
         }
         else {
             let dx = this.x - this.targetX_end;
+
             console.log(dx);
             // dy = this.y - this.targetY_end;
             if (dx != 0) {
                 if (dx < 0) {
                     this.x += 2;
+                    let theta = Math.atan2(0, dx);
+                    this.angle = theta;
                 }
                 else {
                     this.x -= 2;
+                    let theta = Math.atan2(0, dx);
+                    this.angle = theta;
                 }
             }
             else {
@@ -124,6 +141,8 @@ class Fish {
                     if (this.lastPath == false) {
                         this.lastPath = true;
                         this.y = this.targetY_end;
+                        let theta = Math.atan2(this.y, 0);
+                        this.angle = theta;
                     }
                     else {
                         this.lastPath = false;
@@ -133,6 +152,8 @@ class Fish {
                 }
                 else {
                     this.y = this.y + (this.radius + this.gap);
+                    let theta = Math.atan2(this.y, 0);
+                    this.angle = theta;
                     console.log("Change of X ran");
                 }
 
@@ -141,12 +162,27 @@ class Fish {
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = '#073a0b';
+        ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
+        // let dx = this.x - this.targetX_end;
+        // let dy = this.y - this.targetY_end;
+        // let theta = Math.atan2(dy, dx);
+        // this.angle = theta;
         // ctx.fillRect(this.x, this.y, this.radius, 10);
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        let dx = this.x - this.targetX_end;
+        if (dx <= 0) {
+            ctx.drawImage(fishRight, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 35, 0 - 25, this.spriteWidth / 7, this.spriteHeight / 6);
+        }
+        else {
+            ctx.drawImage(fishLeft, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 35, 0 - 25, this.spriteWidth / 7, this.spriteHeight / 6);
+        }
+        ctx.restore();
     }
     checkIntruder() {
         intruderArray.forEach(intruder => {
@@ -169,20 +205,60 @@ class Intruder {
     constructor(locationX, locationY) {
         this.x = locationX;
         this.y = locationY;
-        this.radius = 15;
+        this.radius = 27;
+        this.angle = 0;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.spriteHeight = 397;
+        this.spriteWidth = 418;
+        this.targetX_end = locationX;
+        this.targetY_end = locationY;
     }
     update() {
+        let dx = this.x - this.targetX_end;
+        let dy = this.y - this.targetY_end;
+        let theta = Math.atan2(dy, dx);
+        this.angle = theta;
+        console.log(dx, dy);
+        if (dx > 0) {
+            this.x--;
+        }
+        else if (dx < 0) {
+            this.x++;
+        }
+        if (dy > 0) {
+            this.y--;
+        }
+        else if (dy < 0) {
+            this.y++;
+        }
+        if (dx == 0 && dy == 0) {
 
+            this.targetX_end = Math.floor((Math.random() * (canvas.width - (2 * this.radius))) + this.radius);
+            this.targetY_end = Math.floor((Math.random() * (canvas.height - (2 * this.radius))) + this.radius);
+        }
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = '#7d20ed';
+        ctx.fillStyle = 'rgba(255,255,255,0.0)';
         ctx.lineWidth = 10;
         ctx.strokeStyle = "#FF0000";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        let dx = this.x - this.targetX_end;
+
+        if (dx <= 0) {
+            ctx.drawImage(intruderRight, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 25, 0 - 25, this.spriteWidth / 8, this.spriteHeight / 8);
+        }
+        else {
+            ctx.drawImage(intruderLeft, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 25, 0 - 25, this.spriteWidth / 8, this.spriteHeight / 8);
+        }
+        ctx.restore();
         // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
 }
@@ -192,16 +268,24 @@ class Shrimp {
         this.x = locationX;
         this.y = locationY;
         this.radius = 10;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.spriteWidth = 205;
+        this.spriteHeight = 189;
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = '#7d9900';
+        ctx.fillStyle = 'rgba(255,255,255,0.0';
         ctx.lineWidth = 10;
         ctx.strokeStyle = "#FF0000";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
+        ctx.save();
+        ctx.translate(this.x, this.y)
+        ctx.drawImage(shrimpImage, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 28, this.spriteWidth / 4, this.spriteHeight / 4);
+        ctx.restore();
         // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
 }
@@ -215,6 +299,7 @@ function animate() {
         c.checkIntruder();
     }
     for (let i of intruderArray) {
+        i.update();
         i.draw();
     }
     for (let j of shrimpArray) {
@@ -236,7 +321,7 @@ clearFishButton.onclick = () => {
 }
 
 generateIntruderButton.onclick = () => {
-    intruderArray.push(new Intruder((Math.random() * (canvasPosition.width - (2 * 15))) + 15, (Math.random() * (canvasPosition.height - (2 * 15))) + 15))
+    intruderArray.push(new Intruder(Math.floor((Math.random() * (canvasPosition.width - (2 * 15))) + 15), (Math.floor(Math.random() * (canvasPosition.height - (2 * 15))) + 15)))
     console.log("Intruder created");
 }
 

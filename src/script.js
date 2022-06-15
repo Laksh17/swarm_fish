@@ -87,6 +87,7 @@ class Fish {
         this.reached = false;
         this.spriteHeight = 327;
         this.spriteWidth = 498;
+        this.batteryLevel = 100;
     }
 
     update() {
@@ -98,7 +99,7 @@ class Fish {
         this.targetY_start = slot_start * (canvasPosition.height / count) + this.radius;
         this.targetY_end = slot_end * (canvasPosition.height / count) - this.radius;
 
-        if (this.reached == false) {
+        if (this.reached == false && this.batteryLevel > 15) {
             const dx = this.x - this.targetX_start;
             const dy = this.y - this.targetY_start;
             let theta = Math.atan2(dy, dx);
@@ -117,8 +118,9 @@ class Fish {
                 console.log("This is target" + this.targetY_end);
                 console.log("slot start " + slot_start + " and slot end: " + slot_end + " and count is " + count);
             }
+
         }
-        else {
+        else if (this.reached == true && this.batteryLevel > 15) {
             let dx = this.x - this.targetX_end;
 
             console.log(dx);
@@ -165,11 +167,24 @@ class Fish {
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = "rgba(255, 255, 255, 0.0)";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.closePath();
+        if (this.batteryLevel > 0) {
+            if (this.batteryLevel >= 60) {
+                ctx.fillStyle = "#145214";
+            }
+            else if (this.batteryLevel < 60 && this.batteryLevel >= 30) {
+                ctx.fillStyle = "#e6e600";
+            }
+            else if (this.batteryLevel < 30 && this.batteryLevel >= 10) {
+                ctx.fillStyle = "#ff6600";
+            }
+            else {
+                ctx.fillStyle = "#ff1a1a";
+            }
+
+            ctx.strokeStyle = "black";
+            ctx.font = "20px Verdana";
+            ctx.fillText(this.batteryLevel + "%", this.x - 16, this.y + 53);
+        }
         // let dx = this.x - this.targetX_end;
         // let dy = this.y - this.targetY_end;
         // let theta = Math.atan2(dy, dx);
@@ -348,6 +363,13 @@ function animate() {
     requestAnimationFrame(animate);
 }
 animate();
+
+setInterval(() => {
+    for (let i of fishyArray) {
+        i.batteryLevel -= 2;
+    }
+}, 1000);
+
 
 generateFishButton.onclick = () => {
     fishyArray.push(new Fish(count + 1));

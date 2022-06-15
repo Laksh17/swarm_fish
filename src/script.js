@@ -4,6 +4,7 @@
 //Extras:
 //3) Tracking battery level and making the fish move to the shore when running low on battery
 
+
 //To consider for the detection algorithm
 //1) Color of the object should be different
 //2) Store the coordinates at the time of object detection
@@ -54,8 +55,10 @@ const intruderLeft = new Image();
 intruderLeft.src = 'intruder_fish_left.png';
 const intruderRight = new Image();
 intruderRight.src = 'intruder_fish_right.png';
-const shrimpImage = new Image();
-shrimpImage.src = 'Prawn_Sprite.png';
+const shrimpLeft = new Image();
+shrimpLeft.src = 'Prawn_Sprite.png';
+const shrimpRight = new Image();
+shrimpRight.src = 'Prawn_Sprite_Flip.png';
 class Fish {
     static count() {
         Fish.counter = (Fish.counter || 0) + 1;
@@ -272,10 +275,37 @@ class Shrimp {
         this.frameY = 0;
         this.spriteWidth = 205;
         this.spriteHeight = 189;
+        this.targetX_end = locationX;
+        this.targetY_end = locationY;
+    }
+    update() {
+        let dx = this.x - this.targetX_end;
+        let dy = this.y - this.targetY_end;
+        console.log(dx, dy);
+        let theta = Math.atan2(dy, dx);
+        this.angle = theta;
+        console.log(dx, dy);
+        if (dx > 0) {
+            this.x -= 0.25;
+        }
+        else if (dx < 0) {
+            this.x += 0.25;
+        }
+        if (dy > 0) {
+            this.y -= 0.25;
+        }
+        else if (dy < 0) {
+            this.y += 0.25;
+        }
+        if (dx == 0 && dy == 0) {
+
+            this.targetX_end = Math.floor((Math.random() * (canvas.width - (2 * this.radius))) + this.radius);
+            this.targetY_end = Math.floor((Math.random() * (canvas.height - (2 * this.radius))) + this.radius);
+        }
     }
     draw() {
         // console.log("Function drew");
-        ctx.fillStyle = 'rgba(255,255,255,0.0';
+        ctx.fillStyle = 'rgba(255,255,255,0.0)';
         ctx.lineWidth = 10;
         ctx.strokeStyle = "#FF0000";
         ctx.beginPath();
@@ -283,9 +313,18 @@ class Shrimp {
         ctx.fill();
         ctx.closePath();
         ctx.save();
-        ctx.translate(this.x, this.y)
-        ctx.drawImage(shrimpImage, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 28, this.spriteWidth / 4, this.spriteHeight / 4);
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        let dx = this.x - this.targetX_end;
+
+        if (dx <= 0) {
+            ctx.drawImage(shrimpRight, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 20, this.spriteWidth / 4, this.spriteHeight / 4);
+        }
+        else {
+            ctx.drawImage(shrimpLeft, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 20, this.spriteWidth / 4, this.spriteHeight / 4);
+        }
         ctx.restore();
+
         // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
 }
@@ -303,6 +342,7 @@ function animate() {
         i.draw();
     }
     for (let j of shrimpArray) {
+        j.update();
         j.draw();
     }
     requestAnimationFrame(animate);
@@ -330,7 +370,7 @@ clearIntruderButton.onclick = () => {
 }
 
 generateShrimpButton.onclick = () => {
-    shrimpArray.push(new Shrimp((Math.random() * (canvasPosition.width - (2 * 15))) + 15, (Math.random() * (canvasPosition.height - (2 * 15))) + 15))
+    shrimpArray.push(new Shrimp(Math.floor((Math.random() * (canvasPosition.width - (2 * 15))) + 15), Math.floor((Math.random() * (canvasPosition.height - (2 * 15))) + 15)))
     console.log("Shrimp created");
 }
 

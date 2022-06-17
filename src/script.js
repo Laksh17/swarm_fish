@@ -17,8 +17,8 @@
 //Basic Canvas Setup
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = 650;
-canvas.height = 650;
+canvas.width = 850;
+canvas.height = 700;
 
 let count = 0;
 let gameframe = 0;
@@ -91,7 +91,6 @@ class Fish {
     }
 
     update() {
-        console.log("Function updated");
         let slot_end = this.section;
         let slot_start = this.section - 1;
         const apporxX = 3;
@@ -162,6 +161,43 @@ class Fish {
                     console.log("Change of X ran");
                 }
 
+            }
+        }
+        else {
+            let dx;
+            let dy;
+            if (this.x > (canvas.width / 2)) {
+                dx = this.x - canvas.width + this.radius;
+                console.log(dx + ' is dx');
+            }
+            else {
+                dx = this.x - this.radius;
+                console.log(dx + ' is dx');
+            }
+            if (this.y > (canvas.height / 2)) {
+                dy = this.y - canvas.height + this.radius;
+                console.log(dy + ' is dy');
+            }
+            else {
+                dy = this.y - this.radius;
+                console.log(dy + ' is dy');
+            }
+
+            if (Math.abs(dx) <= Math.abs(dy)) {
+                if (dx > 0) {
+                    this.x--;
+                }
+                else if (dx < 0) {
+                    this.x++;
+                }
+            }
+            else {
+                if (dy > 0) {
+                    this.y--;
+                }
+                else {
+                    this.y++;
+                }
             }
         }
     }

@@ -15,8 +15,8 @@ body {
 }
 
 #canvas {
-    width: 650px;
-    height: 650px;
+    width: 850px;
+    height: 700px;
     border: 3px solid #32131b;
     border-radius: 12px;
     background: linear-gradient(#0eefbb 0%, #1aa4ea 25%, #1ed9ad 50%, #1aa4ea 75%, #1ed9ad 100%);

@@ -88,6 +88,7 @@ class Fish {
         this.spriteHeight = 327;
         this.spriteWidth = 498;
         this.batteryLevel = 100;
+        this.alertCount = 0;
     }
 
     update() {
@@ -184,18 +185,35 @@ class Fish {
             }
 
             if (Math.abs(dx) <= Math.abs(dy)) {
+
                 if (dx > 0) {
+                    if (this.alertCount == 0) {
+                        alert("Collect a fish at coordinates 0," + this.y.toFixed(2));
+                        this.alertCount++;
+                    }
                     this.x--;
                 }
                 else if (dx < 0) {
+                    if (this.alertCount == 0) {
+                        alert("Collect a fish at coordinates " + canvas.width + "," + this.y.toFixed(2));
+                        this.alertCount++;
+                    }
                     this.x++;
                 }
             }
             else {
                 if (dy > 0) {
+                    if (this.alertCount == 0) {
+                        alert("Collect a fish at coordinates " + this.x.toFixed(2) + ",0");
+                        this.alertCount++;
+                    }
                     this.y--;
                 }
                 else {
+                    if (this.alertCount == 0) {
+                        alert("Collect a fish at coordinates " + this.x.toFixed(2) + "," + canvas.height);
+                        this.alertCount++;
+                    }
                     this.y++;
                 }
             }

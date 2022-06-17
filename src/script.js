@@ -271,6 +271,13 @@ class Fish {
             }
         })
     }
+    drawLine() {
+        ctx.fillStyle = "#233223";
+        ctx.beginPath();
+        ctx.moveTo(0, this.targetY_end + this.radius);
+        ctx.lineTo(canvas.width, this.targetY_end + this.radius);
+        ctx.stroke();
+    }
 }
 
 class Intruder {
@@ -405,6 +412,7 @@ function animate() {
         c.update();
         c.draw();
         c.checkIntruder();
+        c.drawLine();
     }
     for (let i of intruderArray) {
         i.update();

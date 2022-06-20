@@ -26,7 +26,7 @@ body {
     display: grid;
 }
 
-#generateFish,
+#deployFish,
 #clearFish,
 #generateIntruder,
 #clearIntruder,
@@ -51,7 +51,7 @@ body {
     font-weight: 600;
 }
 
-#generateFish,
+#deployFish,
 #clearFish {
     color: #f37120;
     background-color: #000000;
@@ -69,7 +69,7 @@ body {
     background-color: #980ef3;
 }
 
-#generateFish:hover,
+#deployFish:hover,
 #clearFish:hover {
     cursor: pointer;
     background-color: #410809;

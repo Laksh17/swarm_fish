@@ -42,6 +42,17 @@ body {
     padding: 3px;
 }
 
+.remove-buttons {
+    width: 90px;
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    font-size: 17px;
+    border-radius: 20%;
+    padding: 5px;
+}
+
 .title {
     font-size: 22px;
     font-family: 'Poppins', sans-serif;
@@ -52,7 +63,8 @@ body {
 }
 
 #deployFish,
-#clearFish {
+#clearFish,
+.remove-buttons {
     color: #f37120;
     background-color: #000000;
 }
@@ -70,7 +82,8 @@ body {
 }
 
 #deployFish:hover,
-#clearFish:hover {
+#clearFish:hover,
+.remove-buttons:hover {
     cursor: pointer;
     background-color: #410809;
 }
@@ -85,4 +98,17 @@ body {
 #clearShrimp:hover {
     cursor: pointer;
     background-color: #217eb3;
+}
+
+#error {
+    display: block;
+    font-size: 20px;
+    padding: 7px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #000000;
+    border-radius: 20px;
+    color: #f37120;
+    position: absolute;
+    bottom: 40px;
+    display: none;
 }

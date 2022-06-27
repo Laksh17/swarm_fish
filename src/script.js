@@ -1,27 +1,38 @@
-//Basic Canvas Setup
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = 850;
 canvas.height = 700;
-const fishRadius = 38
+const fishRadius = 38;
+const maxDeadFish = 1;
+let currentDeadFish = 0;
 
 let deployedState = false;
 let count = 0;
+let idNum = 1;
 let gameframe = 0;
+
+function arrayRemove(arr, value) {
+    return arr.filter(function (ele) {
+        return ele != value;
+    });
+}
 
 let canvasPosition = canvas.getBoundingClientRect();
 let fishyArray = [];
 let intruderArray = [];
 let shrimpArray = [];
 const deployFishButton = document.getElementById("deployFish");
-const clearFishButton = document.getElementById("clearFish");
 const generateIntruderButton = document.getElementById("generateIntruder");
 const clearIntruderButton = document.getElementById("clearIntruder");
 const generateShrimpButton = document.getElementById("generateShrimp");
 const clearShrimpButton = document.getElementById("clearShrimp");
+const clearFishButtons = document.getElementsByClassName("remove-buttons");
+const errorMessage = document.getElementById("error");
+
 console.log(canvas.height);
 
-//Add the fish object
+//Sprites
 const fishLeft = new Image();
 fishLeft.src = 'fish_left.png';
 const fishRight = new Image();
@@ -35,12 +46,6 @@ shrimpLeft.src = 'Prawn_Sprite.png';
 const shrimpRight = new Image();
 shrimpRight.src = 'Prawn_Sprite_Flip.png';
 
-//Create a class for quadrants to be chosen
-//Should accept details about all their 4 points which will be given via another function
-//Assign them some numbers
-//Allot each spawned fish with one of those numbers
-
-//Add the fish object
 class Quadrant {
     constructor(xStart, yStart, xEnd, yEnd) {
         this.xStart = xStart;
@@ -48,12 +53,25 @@ class Quadrant {
         this.xEnd = xEnd;
         this.yEnd = yEnd;
         this.occupied = false;
+        this.center_x = xStart + ((this.xEnd - this.xStart) / 2);
+        this.center_y = yStart + ((this.yEnd - this.yStart) / 2);
+        this.coords = [this.xStart, this.yStart, this.xEnd, this.yEnd];
     }
 }
 
 class Fish {
-    constructor(radius_num, x1, y1, x2, y2) {
+    constructor(radius_num, quad, idNum) {
         // this.x = 50 + 550;
+        this.parts = {
+            WifiModule: 0.02,
+            DepthSensor: 0.03,
+            ShortCircuit: 0.04,
+            UltrasonicSensor: 0.05,
+            IRSensor: 0.06,
+            pHSensor: 0.08,
+            Camera: 0.1,
+        };
+        this.id = idNum;
         this.isPaused = false;
         this.radius = radius_num;
         this.x = this.radius;
@@ -63,10 +81,12 @@ class Fish {
         this.frame = 0;
         this.angle = 0;
         this.gap = 10;
-        this.targetX_start = x1;
-        this.targetX_end = x2;
-        this.targetY_start = y1;
-        this.targetY_end = y2;
+        this.quadTraversal = false;
+        this.targetX_start = quad.xStart;
+        this.targetX_end = quad.xEnd;
+        this.targetY_start = quad.yStart;
+        this.targetY_end = quad.yEnd;
+        this.positions = [this.targetX_start, this.targetY_start, this.targetX_end, this.targetY_end];
         this.approxX = 1.5;
         this.approxY = 1.5;
         this.lastPath = false;
@@ -74,12 +94,28 @@ class Fish {
         this.spriteHeight = 327;
         this.spriteWidth = 498;
         this.batteryLevel = 100;
+        this.distance = 0;
+        this.priority = 0;
+        this.quadrants = [quad];
+        this.bufferQuad = quad;
+        this.accomodate = false
     }
 
     update() {
-        // console.log(3);
         const apporxX = 3;
         const apporxY = 3;
+        if (this.quadrants.length > 1 && this.accomodate == false) {
+            if (this.quadrants[0].xStart == this.quadrants[1].xStart) {
+                this.targetY_start = this.radius;
+                this.targetY_end = canvas.height - this.radius;
+                this.accomodate = true;
+            }
+            else if (this.quadrants[0].yStart == this.quadrants[1].yStart) {
+                this.targetX_start = this.radius;
+                this.targetX_end = canvas.width - this.radius;
+                this.accomodate = true;
+            }
+        }
         if (this.reached == false && this.batteryLevel > 15) {
             console.log("IN first else");
             const dx = this.x - this.targetX_start;
@@ -145,9 +181,7 @@ class Fish {
                     this.angle = theta;
                     console.log("Change of X ran");
                 }
-
             }
-
         }
         else {
             console.log("IN third else");
@@ -236,6 +270,64 @@ class Fish {
             }
         })
     }
+    checkAbsence() {
+        let qNumber = quadrantArray.length;
+        let fNumber = fishyArray.length;
+        if (qNumber != fNumber) {
+            for (let i of quadrantArray) {
+                if (i.occupied == false) {
+                    console.log("Checkabsence is running");
+                    console.log("quadrant is ", i);
+                    this.distance = Math.sqrt((this.x - i.center_x) ** 2 + (this.y - i.center_y) ** 2);
+                    this.bufferQuad = i;
+                    console.log("distance of " + this.id.toString() + " is " + this.distance.toString());
+
+                }
+            }
+        }
+    }
+    checkOtherDistances() {
+        for (let i of fishyArray) {
+            if (i.distance > this.distance) {
+                this.priority++;
+                console.log("priority of " + this.id.toString() + " is " + this.priority.toString());
+            }
+        }
+        if (this.priority == (count - 1)) {
+            console.log("Checkdistance is running for fish ", this.id);
+            this.quadrants.push(this.bufferQuad);
+            // this.bufferQuad.occupied = true;
+            this.bufferQuad = 0;
+        }
+    }
+    crash(index) {
+        let randomNum = Math.random();
+        for (let key in this.parts) {
+            if (randomNum < this.parts[key]) {
+                count -= 1;
+                console.log("count = ", count)
+                currentDeadFish++;
+
+                for (let i of this.quadrants) {
+                    i.occupied = false;
+                    // console.log("quadrant is ", i);
+                }
+
+                errorMessage.textContent = "Error is due to " + key.toString();
+                errorMessage.style.display = "block";
+                fishyArray = arrayRemove(fishyArray, this)
+                for (let f of fishyArray) {
+                    f.checkAbsence();
+                }
+                for (let g of fishyArray) {
+                    g.checkOtherDistances();
+                }
+                break;
+            }
+        }
+
+
+    }
 }
 
 
@@ -263,9 +355,7 @@ function animate() {
     for (let c of fishyArray) {
         c.update();
         c.draw();
-
     }
-    console.log(1);
     // for (let i of intruderArray) {
     //     i.update();
     //     i.draw();
@@ -280,16 +370,64 @@ animate();
 
 setInterval(() => {
     for (let i of fishyArray) {
-        i.batteryLevel -= 2;
+        i.batteryLevel -= 1;
+        if (currentDeadFish < maxDeadFish) {
+            i.crash(fishyArray.indexOf(i));
+        }
     }
-}, 1000);
+}, 3000);
+
+
 
 deployFishButton.onclick = () => {
-    if (deployedState != true) {
+    if (deployedState != true && count == 0) {
         for (let i of quadrantArray) {
-            fishyArray.push(new Fish(fishRadius, i.xStart, i.yStart, i.xEnd, i.yEnd));
-            console.log(i.xStart)
+            fishyArray.push(new Fish(fishRadius, i, idNum));
+            t = document.createElement("button");
+            mainDiv = document.getElementById("button-div");
+            t.className = "remove-buttons";
+            t.textContent = "Remove Fish";
+            mainDiv.append(t);
+            console.log(i.xStart);
+            i.occupied = true;
+            idNum++;
         }
         deployedState = true;
+        count += 4;
+        console.log(fishyArray[0].parts["Camera"]);
     }
+    document.getElementById("deployFish").style.display = "none";
+    runRemoveCheck();
 }
+
+
+function runRemoveCheck() {
+    [...clearFishButtons].forEach(button => {
+        button.addEventListener('click', function handleClick(event) {
+            if (currentDeadFish < maxDeadFish) {
+                button.style.display = "none";
+                currentDeadFish++;
+
+                let current_button_index = [...clearFishButtons].indexOf(button);
+                for (let q of fishyArray[current_button_index].quadrants) {
+                    q.occupied = false;
+                    console.log(q);
+                }
+                fishyArray.splice(current_button_index, 1);
+                count--;
+                for (let f of fishyArray) {
+                    f.checkAbsence();
+                }
+                for (let g of fishyArray) {
+                    g.checkOtherDistances();
+                }
+
+                runRemoveCheck();
+                console.log(clearFishButtons);
+                button.className = "something-else";
+                console.log(fishyArray);
+            }
+        });
+    });
+}
+

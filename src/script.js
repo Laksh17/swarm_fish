@@ -313,7 +313,7 @@ class Fish {
                     // console.log("quadrant is ", i);
                 }
 
-                errorMessage.textContent = "Error is due to " + key.toString();
+                errorMessage.textContent = key.toString() + " error: Fish ID-" + this.id.toString() + " has been withdrawn.";
                 errorMessage.style.display = "block";
                 fishyArray = arrayRemove(fishyArray, this)
                 for (let f of fishyArray) {
@@ -325,7 +325,6 @@ class Fish {
                 break;
             }
         }
-
 
     }
 }
@@ -373,6 +372,8 @@ setInterval(() => {
         i.batteryLevel -= 1;
         if (currentDeadFish < maxDeadFish) {
             i.crash(fishyArray.indexOf(i));
+            runRemoveCheck();
+
         }
     }
 }, 3000);
@@ -383,11 +384,11 @@ deployFishButton.onclick = () => {
     if (deployedState != true && count == 0) {
         for (let i of quadrantArray) {
             fishyArray.push(new Fish(fishRadius, i, idNum));
-            t = document.createElement("button");
-            mainDiv = document.getElementById("button-div");
-            t.className = "remove-buttons";
-            t.textContent = "Remove Fish";
-            mainDiv.append(t);
+            // t = document.createElement("button");
+            // mainDiv = document.getElementById("button-div");
+            // t.className = "remove-buttons";
+            // t.textContent = "Remove Fish";
+            // mainDiv.append(t);
             console.log(i.xStart);
             i.occupied = true;
             idNum++;
@@ -401,33 +402,34 @@ deployFishButton.onclick = () => {
 }
 
 
-function runRemoveCheck() {
-    [...clearFishButtons].forEach(button => {
-        button.addEventListener('click', function handleClick(event) {
-            if (currentDeadFish < maxDeadFish) {
-                button.style.display = "none";
-                currentDeadFish++;
+// function runRemoveCheck() {
+//     [...clearFishButtons].forEach(button => {
+//         button.addEventListener('click', function handleClick(event) {
+//             if (currentDeadFish < maxDeadFish) {
+//                 button.style.display = "none";
+//                 currentDeadFish++;
 
-                let current_button_index = [...clearFishButtons].indexOf(button);
-                for (let q of fishyArray[current_button_index].quadrants) {
-                    q.occupied = false;
-                    console.log(q);
-                }
-                fishyArray.splice(current_button_index, 1);
-                count--;
-                for (let f of fishyArray) {
-                    f.checkAbsence();
-                }
-                for (let g of fishyArray) {
-                    g.checkOtherDistances();
-                }
+//                 let current_button_index = [...clearFishButtons].indexOf(button);
+//                 for (let q of fishyArray[current_button_index].quadrants) {
+//                     q.occupied = false;
+//                     console.log(q);
+//                 }
+//                 fishyArray.splice(current_button_index, 1);
+//                 count--;
+//                 for (let f of fishyArray) {
+//                     f.checkAbsence();
+//                 }
+//                 for (let g of fishyArray) {
+//                     g.checkOtherDistances();
+//                 }
 
-                runRemoveCheck();
-                console.log(clearFishButtons);
-                button.className = "something-else";
-                console.log(fishyArray);
-            }
-        });
-    });
-}
+//                 runRemoveCheck();
+//                 console.log(clearFishButtons);
+//                 button.className = "something-else";
+//                 console.log(fishyArray);
+//             }
+//         });
+
+//     });
+// }
 

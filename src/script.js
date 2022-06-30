@@ -1,42 +1,36 @@
 
-const canvas = document.getElementById('canvas');
+const canvas = document.getElementById('canvas'); //Pool area
 const ctx = canvas.getContext('2d');
 canvas.width = 850;
 canvas.height = 700;
-const fishRadius = 38;
-const maxDeadFish = 1;
+const fishRadius = 38; //Hit-Box radius of the fish
+const maxDeadFish = 1; //Highest possible number of dead fish (for simulation purposes)
 let currentDeadFish = 0;
 
-let deployedState = false;
-let count = 0;
-let idNum = 1;
-let gameframe = 0;
+let deployedState = false; //Check whether initial deployment of the fish is done or not
+let count = 0; //Current number of fishes present
+let idNum = 1; //Assigns ID number to every deployed fish by incrementing after every fish is deployed
 
+//Function removes a value from an array
 function arrayRemove(arr, value) {
     return arr.filter(function (ele) {
         return ele != value;
     });
 }
 
-let canvasPosition = canvas.getBoundingClientRect();
-let fishyArray = [];
-let intruderArray = [];
-let shrimpArray = [];
+let canvasPosition = canvas.getBoundingClientRect(); //Fetches details about the position of an object in the canvas
+let fishyArray = []; //Array of fishes
 const deployFishButton = document.getElementById("deployFish");
-const generateIntruderButton = document.getElementById("generateIntruder");
-const clearIntruderButton = document.getElementById("clearIntruder");
-const generateShrimpButton = document.getElementById("generateShrimp");
-const clearShrimpButton = document.getElementById("clearShrimp");
 const clearFishButtons = document.getElementsByClassName("remove-buttons");
 const errorMessage = document.getElementById("error");
-
-console.log(canvas.height);
 
 //Sprites
 const fishLeft = new Image();
 fishLeft.src = 'fish_left.png';
 const fishRight = new Image();
 fishRight.src = 'fish_right.png';
+
+//Extra Sprites
 const intruderLeft = new Image();
 intruderLeft.src = 'intruder_fish_left.png';
 const intruderRight = new Image();
@@ -48,20 +42,20 @@ shrimpRight.src = 'Prawn_Sprite_Flip.png';
 
 class Quadrant {
     constructor(xStart, yStart, xEnd, yEnd) {
+        //Quadrant is defined by 4 points
         this.xStart = xStart;
         this.yStart = yStart;
         this.xEnd = xEnd;
         this.yEnd = yEnd;
-        this.occupied = false;
+        this.occupied = false; //Status of the quadrant
         this.center_x = xStart + ((this.xEnd - this.xStart) / 2);
         this.center_y = yStart + ((this.yEnd - this.yStart) / 2);
-        this.coords = [this.xStart, this.yStart, this.xEnd, this.yEnd];
+        this.coords = [this.xStart, this.yStart, this.xEnd, this.yEnd]; //Array of coordinates
     }
 }
 
 class Fish {
     constructor(radius_num, quad, idNum) {
-        // this.x = 50 + 550;
         this.parts = {
             WifiModule: 0.02,
             DepthSensor: 0.03,
@@ -72,22 +66,23 @@ class Fish {
             Camera: 0.1,
         };
         this.id = idNum;
-        this.isPaused = false;
-        this.radius = radius_num;
-        this.x = this.radius;
+        this.radius = radius_num; //Radius of the hit-box of the fish
+        this.x = this.radius; //Initial x and y coordinates
         this.y = canvas.height / 2;
         this.frameX = 0;
         this.frameY = 0; //frames of sprite sheet
         this.frame = 0;
-        this.angle = 0;
-        this.gap = 10;
-        this.quadTraversal = false;
+        this.angle = 0; //Denotes how the sprite is oriented
+        this.gap = 10; //minimum gap to be maintained for moving onto the next row in a quadrant
+
+        //Starting and ending x and y coords
         this.targetX_start = quad.xStart;
         this.targetX_end = quad.xEnd;
         this.targetY_start = quad.yStart;
         this.targetY_end = quad.yEnd;
-        this.positions = [this.targetX_start, this.targetY_start, this.targetX_end, this.targetY_end];
-        this.approxX = 1.5;
+
+        this.positions = [this.targetX_start, this.targetY_start, this.targetX_end, this.targetY_end]; //Array to access them sequentially
+        this.approxX = 1.5; // Minimum difference in the destination calculated vs actual destination
         this.approxY = 1.5;
         this.lastPath = false;
         this.reached = false;

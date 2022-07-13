@@ -20,6 +20,7 @@ function arrayRemove(arr, value) {
 
 let canvasPosition = canvas.getBoundingClientRect(); //Fetches details about the position of an object in the canvas
 let fishyArray = []; //Array of fishes
+let contaminationArray = []; //Array of contaminated zones (higher TDS)
 const deployFishButton = document.getElementById("deployFish");
 const clearFishButtons = document.getElementsByClassName("remove-buttons");
 const errorMessage = document.getElementById("error");
@@ -39,6 +40,27 @@ const shrimpLeft = new Image();
 shrimpLeft.src = 'Prawn_Sprite.png';
 const shrimpRight = new Image();
 shrimpRight.src = 'Prawn_Sprite_Flip.png';
+
+class Contamination {
+    constructor(width, height, tds) {
+        this.width = width;
+        this.height = height;
+        this.xStart = Math.random() * (canvas.width - width);
+        this.yStart = Math.random() * (canvas.height - height);
+        this.Xcenter = this.xStart + (width / 2);
+        this.Ycenter = this.yStart + (height / 2);
+        this.TDS = tds;
+        this.hitBoxRadius = width > height ? height : width;
+    }
+    draw() {
+        ctx.fillStyle = '#2023eb';
+        ctx.beginPath();
+        ctx.rect(this.xStart, this.yStart, this.width, this.height);
+        ctx.fill();
+        ctx.closePath();
+        ctx.save();
+    }
+}
 
 class Quadrant {
     constructor(xStart, yStart, xEnd, yEnd) {
@@ -63,6 +85,7 @@ class Fish {
             UltrasonicSensor: 0.05,
             IRSensor: 0.06,
             pHSensor: 0.08,
+            TDSSensor: 0.09,
             Camera: 0.1,
         };
         this.id = idNum;
@@ -250,18 +273,17 @@ class Fish {
         }
         ctx.restore();
     }
-    checkIntruder() {
-        intruderArray.forEach(intruder => {
-            let dx = intruder.x - this.x;
-            let dy = intruder.y - this.y;
+    checkTDS() {
+        contaminationArray.forEach(region => {
+            let dx = region.Xcenter - this.x;
+            let dy = region.Ycenter - this.y;
             let distance = Math.sqrt((dx * dx) + (dy * dy));
             if (
-                distance <= (intruder.radius + this.radius)
+                distance <= (region.hitBoxRadius + this.radius)
             ) {
-                console.log("intruder started");
-                alert("Intruder Detected at location, (" + this.x + ", " + this.y + ")");
-                intruderArray = arrayRemove(intruderArray, intruder);
-                console.log(intruderArray);
+                console.log("detection of contamination started");
+                alert("Region of higher TDS Detected at location, (" + this.x + ", " + this.y + ")");
+                contaminationArray = arrayRemove(contaminationArray, region);
             }
         })
     }
@@ -295,7 +317,7 @@ class Fish {
             this.bufferQuad = 0;
         }
     }
-    crash(index) {
+    crash() {
         let randomNum = Math.random();
         for (let key in this.parts) {
             if (randomNum < this.parts[key]) {
@@ -349,6 +371,10 @@ function animate() {
     for (let c of fishyArray) {
         c.update();
         c.draw();
+        c.checkTDS();
+    }
+    for (let i of contaminationArray) {
+        i.draw();
     }
     // for (let i of intruderArray) {
     //     i.update();
@@ -366,9 +392,7 @@ setInterval(() => {
     for (let i of fishyArray) {
         i.batteryLevel -= 1;
         if (currentDeadFish < maxDeadFish) {
-            i.crash(fishyArray.indexOf(i));
-            runRemoveCheck();
-
+            i.crash();
         }
     }
 }, 3000);
@@ -393,10 +417,17 @@ deployFishButton.onclick = () => {
         console.log(fishyArray[0].parts["Camera"]);
     }
     document.getElementById("deployFish").style.display = "none";
-    runRemoveCheck();
 }
 
 
+
+setInterval(() => {
+    let randomGen = Math.random();
+    if (randomGen > 0. && contaminationArray.length < 8) {
+        contaminationArray.push(new Contamination((Math.random() + 0.5) * 30, (Math.random() + 0.5) * 30, 200))
+    }
+
+}, 1000);
 // function runRemoveCheck() {
 //     [...clearFishButtons].forEach(button => {
 //         button.addEventListener('click', function handleClick(event) {

@@ -1,4 +1,4 @@
-
+//canvas Specs
 const canvas = document.getElementById('canvas'); //Pool area
 const ctx = canvas.getContext('2d');
 canvas.width = 850;
@@ -7,6 +7,7 @@ const fishRadius = 38; //Hit-Box radius of the fish
 const maxDeadFish = 1; //Highest possible number of dead fish (for simulation purposes)
 let currentDeadFish = 0;
 
+//states and counters
 let deployedState = false; //Check whether initial deployment of the fish is done or not
 let count = 0; //Current number of fishes present
 let idNum = 1; //Assigns ID number to every deployed fish by incrementing after every fish is deployed
@@ -18,6 +19,7 @@ function arrayRemove(arr, value) {
     });
 }
 
+//Some more elements
 let canvasPosition = canvas.getBoundingClientRect(); //Fetches details about the position of an object in the canvas
 let fishyArray = []; //Array of fishes
 let contaminationArray = []; //Array of contaminated zones (higher TDS)
@@ -77,8 +79,9 @@ class Quadrant {
 }
 
 class Fish {
-    constructor(radius_num, quad, idNum) {
+    constructor(radius_num, quad, idNum, battery) {
         this.parts = {
+            //Probabilities for failure (for each fish)
             WifiModule: 0.02,
             DepthSensor: 0.03,
             ShortCircuit: 0.04,
@@ -111,12 +114,13 @@ class Fish {
         this.reached = false;
         this.spriteHeight = 327;
         this.spriteWidth = 498;
-        this.batteryLevel = 100;
+        this.batteryLevel = battery;
         this.distance = 0;
         this.priority = 0;
         this.quadrants = [quad];
         this.bufferQuad = quad;
-        this.accomodate = false
+        this.accomodate = false;
+        this.batteryFlag = false;
     }
 
     update() {
@@ -134,7 +138,7 @@ class Fish {
                 this.accomodate = true;
             }
         }
-        if (this.reached == false && this.batteryLevel > 15) {
+        if (this.reached == false && this.batteryLevel > 10) {
             console.log("IN first else");
             const dx = this.x - this.targetX_start;
             const dy = this.y - this.targetY_start;
@@ -158,7 +162,7 @@ class Fish {
             }
 
         }
-        else if (this.reached == true && this.batteryLevel > 15) {
+        else if (this.reached == true && this.batteryLevel > 10) {
             let dx = this.x - this.targetX_end;
             console.log("IN second else");
             console.log(dx);
@@ -202,7 +206,6 @@ class Fish {
             }
         }
         else {
-            console.log("IN third else");
             let dx;
             let dy;
             if (this.x > (canvas.width / 2)) {
@@ -225,17 +228,34 @@ class Fish {
             if (Math.abs(dx) <= Math.abs(dy)) {
                 if (dx > 0) {
                     this.x--;
+                    if (this.batteryFlag == false) {
+                        alert(`Pickup Fish Number ${this.id} at 0.00 , ${this.y.toFixed(2)} `);
+                        this.batteryFlag = true;
+                    }
+
                 }
                 else if (dx < 0) {
                     this.x++;
+                    if (this.batteryFlag == false) {
+                        alert(`Pickup Fish Number-${this.id} at ${canvas.width} , ${this.y.toFixed(2)} `);
+                        this.batteryFlag = true;
+                    }
                 }
             }
             else {
                 if (dy > 0) {
                     this.y--;
+                    if (this.batteryFlag == false) {
+                        alert(`Pickup Fish Number-${this.id} ${this.x.toFixed(2)}, 0.00 `);
+                        this.batteryFlag = true;
+                    }
                 }
                 else {
                     this.y++;
+                    if (this.batteryFlag == false) {
+                        alert(`Pickup Fish Number-${this.id} at ${this.x.toFixed(2)}, ${canvas.height}`);
+                        this.batteryFlag = true;
+                    }
                 }
             }
         }
@@ -390,19 +410,19 @@ animate();
 
 setInterval(() => {
     for (let i of fishyArray) {
-        i.batteryLevel -= 1;
+        i.batteryLevel -= 2;
         if (currentDeadFish < maxDeadFish) {
             i.crash();
         }
     }
 }, 3000);
 
-
+batteryDetails = [36, 42, 54, 66]
 
 deployFishButton.onclick = () => {
     if (deployedState != true && count == 0) {
         for (let i of quadrantArray) {
-            fishyArray.push(new Fish(fishRadius, i, idNum));
+            fishyArray.push(new Fish(fishRadius, i, idNum, batteryDetails[quadrantArray.indexOf(i)]));
             // t = document.createElement("button");
             // mainDiv = document.getElementById("button-div");
             // t.className = "remove-buttons";
@@ -423,7 +443,7 @@ deployFishButton.onclick = () => {
 
 setInterval(() => {
     let randomGen = Math.random();
-    if (randomGen > 0. && contaminationArray.length < 8) {
+    if (randomGen > 0. && contaminationArray.length < 3) {
         contaminationArray.push(new Contamination((Math.random() + 0.5) * 30, (Math.random() + 0.5) * 30, 200))
     }
 

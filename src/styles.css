@@ -65,7 +65,7 @@ body {
 #deployFish,
 #clearFish,
 .remove-buttons {
-    color: #f37120;
+    color: #110a05;
     background-color: #df2e2e;
 }
 
@@ -85,6 +85,7 @@ body {
 #clearFish:hover,
 .remove-buttons:hover {
     cursor: pointer;
+    color: #df2e2e;
     background-color: #410809;
 }
 

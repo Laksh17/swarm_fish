@@ -23,8 +23,13 @@ function arrayRemove(arr, value) {
 let canvasPosition = canvas.getBoundingClientRect(); //Fetches details about the position of an object in the canvas
 let fishyArray = []; //Array of fishes
 let contaminationArray = []; //Array of contaminated zones (higher TDS)
+let intruderArray = [];
+let shrimpArray = [];
 const deployFishButton = document.getElementById("deployFish");
-const clearFishButtons = document.getElementsByClassName("remove-buttons");
+const generateIntruderButton = document.getElementById("generateIntruder");
+const clearIntruderButton = document.getElementById("clearIntruder");
+const generateShrimpButton = document.getElementById("generateShrimp");
+const clearShrimpButton = document.getElementById("clearShrimp");
 const errorMessage = document.getElementById("error");
 
 //Sprites
@@ -64,6 +69,68 @@ class Contamination {
     }
 }
 
+class Intruder {
+    constructor(locationX, locationY) {
+        this.x = locationX;
+        this.y = locationY;
+        this.radius = 27;
+        this.angle = 0;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.spriteHeight = 397;
+        this.spriteWidth = 418;
+        this.targetX_end = locationX;
+        this.targetY_end = locationY;
+    }
+    update() {
+        let dx = this.x - this.targetX_end;
+        let dy = this.y - this.targetY_end;
+        let theta = Math.atan2(dy, dx);
+        this.angle = theta;
+        console.log(dx, dy);
+        if (dx > 0) {
+            this.x--;
+        }
+        else if (dx < 0) {
+            this.x++;
+        }
+        if (dy > 0) {
+            this.y--;
+        }
+        else if (dy < 0) {
+            this.y++;
+        }
+        if (dx == 0 && dy == 0) {
+
+            this.targetX_end = Math.floor((Math.random() * (canvas.width - (2 * this.radius))) + this.radius);
+            this.targetY_end = Math.floor((Math.random() * (canvas.height - (2 * this.radius))) + this.radius);
+        }
+    }
+    draw() {
+        // console.log("Function drew");
+        ctx.fillStyle = 'rgba(255,255,255,0.0)';
+        // ctx.lineWidth = 10;
+        // ctx.strokeStyle = "#FF0000";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        let dx = this.x - this.targetX_end;
+
+        if (dx <= 0) {
+            ctx.drawImage(intruderRight, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 25, 0 - 25, this.spriteWidth / 8, this.spriteHeight / 8);
+        }
+        else {
+            ctx.drawImage(intruderLeft, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 25, 0 - 25, this.spriteWidth / 8, this.spriteHeight / 8);
+        }
+        ctx.restore();
+        // ctx.fillRect(this.x, this.y, this.radius, 10);
+    }
+}
+
 class Quadrant {
     constructor(xStart, yStart, xEnd, yEnd) {
         //Quadrant is defined by 4 points
@@ -75,6 +142,69 @@ class Quadrant {
         this.center_x = xStart + ((this.xEnd - this.xStart) / 2);
         this.center_y = yStart + ((this.yEnd - this.yStart) / 2);
         this.coords = [this.xStart, this.yStart, this.xEnd, this.yEnd]; //Array of coordinates
+    }
+}
+
+class Shrimp {
+    constructor(locationX, locationY) {
+        this.x = locationX;
+        this.y = locationY;
+        this.radius = 10;
+        this.frameX = 0;
+        this.frameY = 0;
+        this.spriteWidth = 205;
+        this.spriteHeight = 189;
+        this.targetX_end = locationX;
+        this.targetY_end = locationY;
+    }
+    update() {
+        let dx = this.x - this.targetX_end;
+        let dy = this.y - this.targetY_end;
+        console.log(dx, dy);
+        let theta = Math.atan2(dy, dx);
+        this.angle = theta;
+        console.log(dx, dy);
+        if (dx > 0) {
+            this.x -= 0.25;
+        }
+        else if (dx < 0) {
+            this.x += 0.25;
+        }
+        if (dy > 0) {
+            this.y -= 0.25;
+        }
+        else if (dy < 0) {
+            this.y += 0.25;
+        }
+        if (dx == 0 && dy == 0) {
+
+            this.targetX_end = Math.floor((Math.random() * (canvas.width - (2 * this.radius))) + this.radius);
+            this.targetY_end = Math.floor((Math.random() * (canvas.height - (2 * this.radius))) + this.radius);
+        }
+    }
+    draw() {
+        // console.log("Function drew");
+        ctx.fillStyle = 'rgba(255,255,255,0.0)';
+        // ctx.lineWidth = 10;
+        // ctx.strokeStyle = "#FF0000";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        let dx = this.x - this.targetX_end;
+
+        if (dx <= 0) {
+            ctx.drawImage(shrimpRight, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 20, this.spriteWidth / 4, this.spriteHeight / 4);
+        }
+        else {
+            ctx.drawImage(shrimpLeft, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, 0 - 30, 0 - 20, this.spriteWidth / 4, this.spriteHeight / 4);
+        }
+        ctx.restore();
+
+        // ctx.fillRect(this.x, this.y, this.radius, 10);
     }
 }
 
@@ -293,20 +423,37 @@ class Fish {
         }
         ctx.restore();
     }
-    checkTDS() {
-        contaminationArray.forEach(region => {
-            let dx = region.Xcenter - this.x;
-            let dy = region.Ycenter - this.y;
+
+    checkIntruder() {
+        intruderArray.forEach(intruder => {
+            let dx = intruder.x - this.x;
+            let dy = intruder.y - this.y;
             let distance = Math.sqrt((dx * dx) + (dy * dy));
             if (
-                distance <= (region.hitBoxRadius + this.radius)
+                distance <= (intruder.radius + this.radius)
             ) {
-                console.log("detection of contamination started");
-                alert("Region of higher TDS Detected at location, (" + this.x + ", " + this.y + ")");
-                contaminationArray = arrayRemove(contaminationArray, region);
+                console.log("intruder started");
+                alert("Intruder Detected at location, (" + this.x + ", " + this.y + ")");
+                intruderArray = arrayRemove(intruderArray, intruder);
+                console.log(intruderArray);
             }
         })
     }
+
+    // checkTDS() {
+    //     contaminationArray.forEach(region => {
+    //         let dx = region.Xcenter - this.x;
+    //         let dy = region.Ycenter - this.y;
+    //         let distance = Math.sqrt((dx * dx) + (dy * dy));
+    //         if (
+    //             distance <= (region.hitBoxRadius + this.radius)
+    //         ) {
+    //             console.log("detection of contamination started");
+    //             alert("Region of higher TDS Detected at location, (" + this.x + ", " + this.y + ")");
+    //             contaminationArray = arrayRemove(contaminationArray, region);
+    //         }
+    //     })
+    // }
     checkAbsence() {
         let qNumber = quadrantArray.length;
         let fNumber = fishyArray.length;
@@ -391,19 +538,19 @@ function animate() {
     for (let c of fishyArray) {
         c.update();
         c.draw();
-        c.checkTDS();
+        c.checkIntruder();
     }
-    for (let i of contaminationArray) {
-        i.draw();
-    }
-    // for (let i of intruderArray) {
-    //     i.update();
+    // for (let i of contaminationArray) {
     //     i.draw();
     // }
-    // for (let j of shrimpArray) {
-    //     j.update();
-    //     j.draw();
-    // }
+    for (let i of intruderArray) {
+        i.update();
+        i.draw();
+    }
+    for (let j of shrimpArray) {
+        j.update();
+        j.draw();
+    }
     requestAnimationFrame(animate);
 }
 animate();
@@ -434,20 +581,38 @@ deployFishButton.onclick = () => {
         }
         deployedState = true;
         count += 4;
-        console.log(fishyArray[0].parts["Camera"]);
+        // console.log(fishyArray[0].parts["Camera"]);
     }
     document.getElementById("deployFish").style.display = "none";
 }
 
+generateIntruderButton.onclick = () => {
+    intruderArray.push(new Intruder(Math.floor((Math.random() * (canvasPosition.width - (2 * 15))) + 15), (Math.floor(Math.random() * (canvasPosition.height - (2 * 15))) + 15)))
+    console.log("Intruder created");
+}
+
+clearIntruderButton.onclick = () => {
+    intruderArray.pop();
+}
+
+generateShrimpButton.onclick = () => {
+    shrimpArray.push(new Shrimp(Math.floor((Math.random() * (canvasPosition.width - (2 * 15))) + 15), Math.floor((Math.random() * (canvasPosition.height - (2 * 15))) + 15)))
+    console.log("Shrimp created");
+}
+
+clearShrimpButton.onclick = () => {
+    shrimpArray.pop();
+}
+
+// setInterval(() => {
+//     let randomGen = Math.random();
+//     if (randomGen > 0. && contaminationArray.length < 3) {
+//         contaminationArray.push(new Contamination((Math.random() + 0.5) * 30, (Math.random() + 0.5) * 30, 200))
+//     }
+
+// }, 1000);
 
 
-setInterval(() => {
-    let randomGen = Math.random();
-    if (randomGen > 0. && contaminationArray.length < 3) {
-        contaminationArray.push(new Contamination((Math.random() + 0.5) * 30, (Math.random() + 0.5) * 30, 200))
-    }
-
-}, 1000);
 // function runRemoveCheck() {
 //     [...clearFishButtons].forEach(button => {
 //         button.addEventListener('click', function handleClick(event) {
